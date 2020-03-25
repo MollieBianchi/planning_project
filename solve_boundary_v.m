@@ -1,7 +1,7 @@
 function [u,n] = solve_boundary_v(robot_id, robot_A, robot_B, tau)
     
     vel_target = robot_A.cur_vel - robot_B.cur_vel;
-    radius = (robot_A.radius + robot_B.radius)/tau;
+    radius = (robot_A.radius + robot_B.radius+0.1)/tau;
 
     center = (robot_B.cur_pos - robot_A.cur_pos)/tau;
 
@@ -190,38 +190,40 @@ function [u,n] = solve_boundary_v(robot_id, robot_A, robot_B, tau)
     u = v - (vel_target);
     
     % plotting for debugging
-    figure(robot_id)
-    clf
-    hold on
-    plot(vel_target(1), vel_target(2), 'g*')
-    plot(v_upper(1), v_upper(2), 'bo')
-    plot(v_lower(1), v_lower(2), 'bo')
-    plot(v_circle(1), v_circle(2), 'bo')
-    plot(v(1), v(2), 'b*')
-    plot(upperbound(1),upperbound(2),'ro')
-    plot(lowerbound(1),lowerbound(2),'ro')
-    plot(center(1),center(2),'ro')
-    
-    plot([0, center(1),center(1)*100], [0, center(2),center(2)*100], 'r:')
-    plot([0, upperbound(1),upperbound(1)*100], [0, upperbound(2), upperbound(2)*100], 'r--')
-    plot([0, lowerbound(1),lowerbound(1)*100], [0, lowerbound(2), lowerbound(2)*100], 'r--')
-    
-    x = center(1);
-    y = center(2);
-    ang=0:0.01:2*pi; 
-    xp=radius*cos(ang);
-    yp=radius*sin(ang);
-    plot(x+xp,y+yp, 'r--');
+    if robot_id == 1
+        figure(robot_id+1)
+        %clf
+        hold on
+        plot(vel_target(1), vel_target(2), 'g*')
+        plot(v_upper(1), v_upper(2), 'bo')
+        plot(v_lower(1), v_lower(2), 'bo')
+        plot(v_circle(1), v_circle(2), 'bo')
+        plot(v(1), v(2), 'b*')
+        plot(upperbound(1),upperbound(2),'ro')
+        plot(lowerbound(1),lowerbound(2),'ro')
+        plot(center(1),center(2),'ro')
 
-    x = center(1)*tau;
-    y = center(2)*tau;
-    ang=0:0.01:2*pi; 
-    xp=radius*tau*cos(ang);
-    yp=radius*tau*sin(ang);
-    plot(x+xp,y+yp, 'r--');
-    
-    xlim([-4,4]);
-    ylim([-4,4]);
+        plot([0, center(1),center(1)*100], [0, center(2),center(2)*100], 'r:')
+        plot([0, upperbound(1),upperbound(1)*100], [0, upperbound(2), upperbound(2)*100], 'r--')
+        plot([0, lowerbound(1),lowerbound(1)*100], [0, lowerbound(2), lowerbound(2)*100], 'r--')
+
+        x = center(1);
+        y = center(2);
+        ang=0:0.01:2*pi; 
+        xp=radius*cos(ang);
+        yp=radius*sin(ang);
+        plot(x+xp,y+yp, 'r--');
+
+        x = center(1)*tau;
+        y = center(2)*tau;
+        ang=0:0.01:2*pi; 
+        xp=radius*tau*cos(ang);
+        yp=radius*tau*sin(ang);
+        plot(x+xp,y+yp, 'r--');
+
+        xlim([-4,4]);
+        ylim([-4,4]);
+    end
 end
 
 

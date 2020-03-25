@@ -1,10 +1,23 @@
 
 % intialize the problem
-[num_robots, delta_t, tau, robots] = swap_places();
+[num_robots, delta_t, tau, robots] = swap_places_5();
 
 poses = [];
 
-for i = 1:200
+for i = 1:2000
+    
+    figure(1)
+    clf
+    figure(2)
+    clf
+%     figure(3)
+%     clf
+%     figure(4)
+%     clf
+%     figure(5)
+%     clf
+    
+    
     
     new_velocities = zeros(2,num_robots);
     
@@ -18,7 +31,7 @@ for i = 1:200
                 robot_B = robots(B);
                 
                 % add a check in case the robot is too far
-                if sqrt(sum((robot_B.cur_pos - robot_A.cur_pos).^2)) - robot_A.radius - robot_B.radius <= (robot_B.max_speed+robot_A.max_speed)*tau
+                %if sqrt(sum((robot_B.cur_pos - robot_A.cur_pos).^2)) - robot_A.radius - robot_B.radius <= (robot_B.max_speed+robot_A.max_speed)*tau
                     % compute half plane                
                     % solve for v on boundary
                     [u,n] = solve_boundary_v(A, robot_A, robot_B, tau);  
@@ -26,7 +39,7 @@ for i = 1:200
                     c = c + 1;
                     half_planes(:,c) = u;  
                     normals(:,c) = n;
-                end
+                %end
             end            
         end
         
@@ -42,27 +55,24 @@ for i = 1:200
             
             A_con(con, 1:2) = -n';
             b_con(con) = -(robot_A.cur_vel + 1/2*u)'*n;
+            
+            plot_velocity(robot_A.pref_vel, robot_A.cur_vel, u, n, A);
         end
         UB = [robot_A.max_speed, robot_A.max_speed];
         LB = [-robot_A.max_speed, -robot_A.max_speed];
         
         options = optimoptions('quadprog','Display','off');
-        v = quadprog(H, f, A_con, b_con, [],[],[],[], robot_A.cur_vel + 1/2*u, options);
-       
-        % min abs(v - v_pref)
-        % s.t.       
-        % constraints
-        % v 
-        % for each of the other robots
-        % (v - (v_cur_A + 1/2u))*n >= 0
-        % v*n >= (v_cur_A + 1/2u)*n
-        plot_velocity(robot_A.pref_vel, robot_A.cur_vel, u, v, n, A);
-        new_velocities(1:2,A) = v;
+        v = quadprog(H, f, A_con, b_con, [],[],[],[], [0;0], options);
         
+        if A == 1
+            figure(A);
+            hold on
+            plot(v(1), v(2), 'm*');
+        end
+        
+        new_velocities(1:2,A) = v;
+        %new_velocities(1:2,A) = robot_A.pref_vel;
     end
-    
-    figure(1);
-    hold on;
     
     all_robots_at_goal = true;
     
@@ -81,7 +91,10 @@ for i = 1:200
         end
         
         % update preferred velocities
-        robot.pref_vel = max(-robot.max_speed+0.1, min(robot.max_speed-0.1, (robot.goal_pos-robot.cur_pos)/delta_t));
+        direction = robot.goal_pos-robot.cur_pos;
+        direction = direction/sqrt(sum(direction.^2));
+        
+        robot.pref_vel = direction*robot.max_speed;
         
         % update robots
         robots(A) = robot;
@@ -90,7 +103,6 @@ for i = 1:200
         
         % update plot
         circle(robot.cur_pos, robot.radius,A);
-        %plot_velocity(robot.cur_vel, A);
     end
     
     

@@ -3,6 +3,12 @@ function circle(pos,r,A)
     %r is the radius of the circle
     if A ==1
         color = 'r';
+    elseif A == 2
+        color = 'g';
+    elseif A == 3
+        color = 'm';
+    elseif A == 4
+        color = 'c';
     else
         color = 'b';
     end
@@ -11,11 +17,11 @@ function circle(pos,r,A)
     ang=0:0.01:2*pi; 
     xp=r*cos(ang);
     yp=r*sin(ang);
-    figure(3)
+    figure(6)
     hold on
     plot(x+xp,y+yp, 'linewidth', 1, 'color', color);
 
-    xlim([0,4]);
-    ylim([0,4]);
+    xlim([-1.5,1.5]);
+    ylim([-1.5,1.5]);
     
 end
